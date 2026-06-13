@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, StdCtrls,
-  ExtCtrls, Menus, Registry, IniFiles, MMSystem, TypInfo,
+  ExtCtrls, Menus, Registry, IniFiles, MMSystem, TypInfo, LCLType,
   NetworkTypes, Utilities, DiscoveryManager, MessageManager, FileTransferManager;
 
 type
@@ -83,14 +83,40 @@ var
 implementation
 
 {$R *.lfm}
+{$R resource.rc}
 
 { TFormMain }
 
 procedure TFormMain.FormCreate(Sender: TObject);
+var
+  Png: TPortableNetworkGraphic;
+  ResStream: TResourceStream;
 begin
   Caption := 'LAN Broadcaster';
   FClosingFromTray := False;
   FFirstShow := True;
+  
+  { Load PNG from resource and set as Application Icon and Tray Icon }
+  try
+    if FindResource(HInstance, 'LANBROADCASTER_PNG', RT_RCDATA) <> 0 then
+    begin
+      Png := TPortableNetworkGraphic.Create;
+      try
+        ResStream := TResourceStream.Create(HInstance, 'LANBROADCASTER_PNG', RT_RCDATA);
+        try
+          Png.LoadFromStream(ResStream);
+          Application.Icon.Assign(Png);
+          TrayIcon.Icon.Assign(Png);
+        finally
+          ResStream.Free;
+        end;
+      finally
+        Png.Free;
+      end;
+    end;
+  except
+    { Fallback if resource fails to load }
+  end;
   
   { Initialize networking managers }
   FDiscovery := TDiscoveryManager.Create;
