@@ -267,9 +267,6 @@ object FormMain: TFormMain
   end
   object TrayIcon: TTrayIcon
     Hint = 'LAN Broadcaster'
-    BalloonTitle = 'LAN Broadcaster'
-    BalloonText = 'Application is minimized to the system tray.'
-    BalloonFlags = bfInfo
     PopupMenu = TrayPopupMenu
     OnDblClick = TrayIconDblClick
     Left = 280

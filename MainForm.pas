@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, StdCtrls,
-  ExtCtrls, Menus, Registry, IniFiles, MMSystem,
+  ExtCtrls, Menus, Registry, IniFiles, MMSystem, TypInfo,
   NetworkTypes, Utilities, DiscoveryManager, MessageManager, FileTransferManager;
 
 type
@@ -63,6 +63,7 @@ type
     procedure SetStartupRegistry(const Enable: Boolean);
     function GetStartupRegistry: Boolean;
     procedure PlayAlertSound;
+    procedure SetTrayBalloonProperties(Tray: TTrayIcon; const ATitle, AText: string);
 
     { Thread-safe event handlers from managers }
     procedure OnUserJoined(const User: TOnlineUser);
@@ -164,6 +165,8 @@ begin
     CanClose := False;
     Hide;
     TrayIcon.Visible := True;
+    { Setup tray properties dynamically at runtime via TypInfo to prevent version mismatches }
+    SetTrayBalloonProperties(TrayIcon, 'LAN Broadcaster', 'Application is minimized to the system tray.');
     { Show a subtle balloon hint only once to notify user it is in the tray }
     TrayIcon.ShowBalloonHint;
   end;
@@ -434,6 +437,24 @@ begin
   end;
   
   Item.SubItems[4] := Progress.Status; { Status Column }
+end;
+
+procedure TFormMain.SetTrayBalloonProperties(Tray: TTrayIcon; const ATitle, AText: string);
+begin
+  if IsPublishedProp(Tray, 'BalloonText') then
+    SetPropValue(Tray, 'BalloonText', AText)
+  else if IsPublishedProp(Tray, 'BaloonText') then
+    SetPropValue(Tray, 'BaloonText', AText);
+
+  if IsPublishedProp(Tray, 'BalloonTitle') then
+    SetPropValue(Tray, 'BalloonTitle', ATitle)
+  else if IsPublishedProp(Tray, 'BaloonTitle') then
+    SetPropValue(Tray, 'BaloonTitle', ATitle);
+    
+  if IsPublishedProp(Tray, 'BalloonFlags') then
+    SetEnumProp(Tray, 'BalloonFlags', 'bfInfo')
+  else if IsPublishedProp(Tray, 'BaloonFlags') then
+    SetEnumProp(Tray, 'BaloonFlags', 'bfInfo');
 end;
 
 procedure TFormMain.UpdateClientCount;
