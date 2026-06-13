@@ -182,19 +182,22 @@ end;
 
 procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
-  if FClosingFromTray then
+  if FClosingFromTray or Application.Terminated then
+    CanClose := True
+  else
   begin
-    CanClose := True;
-  end;
-  if not FClosingFromTray and CheckBoxMinimizeClose.Checked then
-  begin
-    CanClose := False;
-    Hide;
-    TrayIcon.Visible := True;
-    { Setup tray properties dynamically at runtime via TypInfo to prevent version mismatches }
-    SetTrayBalloonProperties(TrayIcon, 'LAN Broadcaster', 'Application is minimized to the system tray.');
-    { Show a subtle balloon hint only once to notify user it is in the tray }
-    TrayIcon.ShowBalloonHint;
+    if CheckBoxMinimizeClose.Checked then
+    begin
+      CanClose := False;
+      Hide;
+      TrayIcon.Visible := True;
+      { Setup tray properties dynamically at runtime via TypInfo to prevent version mismatches }
+      SetTrayBalloonProperties(TrayIcon, 'LAN Broadcaster', 'Application is minimized to the system tray.');
+      { Show a subtle balloon hint only once to notify user it is in the tray }
+      TrayIcon.ShowBalloonHint;
+    end
+    else
+      CanClose := True;
   end;
 end;
 

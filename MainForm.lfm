@@ -9,6 +9,7 @@ object FormMain: TFormMain
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
+  OnCloseQuery = FormCloseQuery
   LCLVersion = '2.2.6.0'
   object PanelLeft: TPanel
     Left = 0
